@@ -1,0 +1,177 @@
+{
+  "version": "3.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "currentViewName": null,
+  "defaultView": {
+    "detailLevel": "All",
+    "relationshipMode": "All",
+    "tablePositions": [
+      {
+        "name": "Dim_Plan",
+        "schemaName": "public",
+        "x": 1046.7392947103276,
+        "y": 589.3545340050377
+      },
+      {
+        "name": "Dim_TipoBeneficio",
+        "schemaName": "public",
+        "x": 1005.499685138539,
+        "y": 757.5979219143579
+      },
+      {
+        "name": "Dim_CondicionPago",
+        "schemaName": "public",
+        "x": -1.9173525562814575,
+        "y": 589.3545340050377
+      },
+      {
+        "name": "Dim_Fecha",
+        "schemaName": "public",
+        "x": 617.4724496221663,
+        "y": 334.09068010075566
+      },
+      {
+        "name": "Dim_Proveedor",
+        "schemaName": "public",
+        "x": 130.09524559193966,
+        "y": 1081.9622166246852
+      },
+      {
+        "name": "Dim_AreaDeServicio",
+        "schemaName": "public",
+        "x": 508.7498425692695,
+        "y": 1079.7566120906802
+      },
+      {
+        "name": "Hecho_OfertaPlanes",
+        "schemaName": "public",
+        "x": 567.3287817813286,
+        "y": 615.5979219143577
+      }
+    ],
+    "tableGroupCollapseStates": [],
+    "stickyNoteLayouts": [],
+    "referencePaths": [
+      {
+        "firstFieldNames": [
+          "ID_Plan"
+        ],
+        "firstTableName": "Hecho_OfertaPlanes",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "ID_Plan"
+        ],
+        "secondTableName": "Dim_Plan",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "ID_TipoBeneficio"
+        ],
+        "firstTableName": "Hecho_OfertaPlanes",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "ID_TipoBeneficio"
+        ],
+        "secondTableName": "Dim_TipoBeneficio",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "ID_CondicionCopago"
+        ],
+        "firstTableName": "Hecho_OfertaPlanes",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "ID_CondicionPago"
+        ],
+        "secondTableName": "Dim_CondicionPago",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "ID_CondicionCoseguro"
+        ],
+        "firstTableName": "Hecho_OfertaPlanes",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "ID_CondicionPago"
+        ],
+        "secondTableName": "Dim_CondicionPago",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": [
+          {
+            "x": 359.135383595341,
+            "y": 887.5979219143577
+          },
+          {
+            "x": 359.135383595341,
+            "y": 674.8129895037098
+          },
+          {
+            "x": 282.10901463121854,
+            "y": 674.8129895037098
+          }
+        ]
+      },
+      {
+        "firstFieldNames": [
+          "ID_Fecha"
+        ],
+        "firstTableName": "Hecho_OfertaPlanes",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "ID_Fecha"
+        ],
+        "secondTableName": "Dim_Fecha",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "ID_Proveedor"
+        ],
+        "firstTableName": "Hecho_OfertaPlanes",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "ID_Proveedor"
+        ],
+        "secondTableName": "Dim_Proveedor",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "ID_AreaDeServicio"
+        ],
+        "firstTableName": "Hecho_OfertaPlanes",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "ID_AreaDeServicio"
+        ],
+        "secondTableName": "Dim_AreaDeServicio",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      }
+    ]
+  },
+  "views": {}
+}

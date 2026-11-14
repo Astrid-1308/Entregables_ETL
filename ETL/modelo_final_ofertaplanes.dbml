@@ -1,0 +1,343 @@
+// ============================================================================
+// Modelo multidimensional final - OfertaPlanes (RaSa)
+//
+// Base estructural: modelo_inicial_ofertaplanes.dbml.
+// Ajustes aplicados: R1 a R9 de la evaluacion con IA y de la validacion
+// practica (ver ajustes_modelo_final_ofertaplanes.md).
+//
+// Fuentes:
+//   F1 = FuenteAreasDeServicio_Copia_E
+//   F2 = FuenteTiposBeneficio_Copia_E
+//   F3 = FuentesPlanesBeneficio_Copia_E
+//   F4 = FuenteCondicionesDePago_Copia_E
+//
+// Convencion (R9): prefijos Dim_, Hecho_ y Puente_; columnas PascalCase;
+// llave subrogada ID_<Dimension> y llave natural Id<Dimension>. La nota de
+// cada llave natural indica el campo de origen del diccionario.
+//
+// Miembros especiales (R8): todas las dimensiones incluyen el miembro 0
+// "Desconocido / No aplica". El hecho nunca usa llaves nulas.
+// ============================================================================
+
+Project Modelo_Final_OfertaPlanes {
+  Note: '''
+    Modelo dimensional del proceso OfertaPlanes (RaSa), proceso anual.
+
+    Tablas:
+      - Hecho_OfertaPlanes: grano declarado en la nota de la tabla.
+      - Dimensiones: Dim_Fecha, Dim_Proveedor, Dim_Plan, Dim_TipoBeneficio,
+        Dim_AreaDeServicio, Dim_CondicionPago y Dim_Geografia.
+      - Puente_AreaGeografia: tabla puente entre la version de area de
+        servicio y sus condados.
+
+    Roles de dimension: Dim_CondicionPago participa dos veces en el hecho
+    (ID_CondicionCopago e ID_CondicionCoseguro). Se conserva una sola
+    dimension y dos referencias con nombre de rol.
+
+    Historia (R4):
+      - SCD Tipo 2 con vigencia anual: Dim_TipoBeneficio y
+        Dim_AreaDeServicio.
+      - SCD Tipo 1: Dim_Proveedor, Dim_Plan, Dim_CondicionPago y
+        Dim_Geografia.
+
+    Geografia (R1): F1 relaciona cada area con un condado (idGeografia_T),
+    por lo que un area cubre varios condados. Condado y PoblacionAct viven
+    en Dim_Geografia y se relacionan con cada version de area mediante
+    Puente_AreaGeografia. La poblacion de F1 es actual, no historica por
+    ano. Las areas no cubren todos los condados del pais (regla 1 del caso),
+    de modo que el universo geografico es el de las areas modeladas.
+
+    Reglas de negocio documentadas (R8):
+      - Limite cuantitativo sin valor o en cero en planes que lo ofrecen:
+        valor por defecto 333, marcado con EsLimitePorDefecto = Yes.
+      - Maximos de 2018: copago 3500 y coseguro 100.
+      - Fechas en formato YYYY-MM-DD antes de buscar ID_Fecha.
+      - Eliminacion de duplicados en todas las fuentes.
+      - Dim_AreaDeServicio se carga con el universo completo de F1, no solo
+        con las areas que tienen ofertas, para que 2.a, 2.b y 2.c midan la
+        cobertura real.
+      - El miembro 0 de Dim_AreaDeServicio recibe las areas de F3 que no
+        existen en F1.
+  '''
+}
+
+// ----------------------------------------------------------------------------
+// DIMENSIONES
+// ----------------------------------------------------------------------------
+
+Table Dim_Fecha {
+  ID_Fecha int [pk, note: 'Llave subrogada del calendario. Miembro 0 = Desconocido / No aplica']
+  Fecha date [not null, unique, note: 'Llave natural. Origen: F3.Fecha (fecha de oferta del beneficio). Formato YYYY-MM-DD']
+  Dia int [not null, note: 'Dia del calendario (1-31)']
+  Mes int [not null, note: 'Mes del calendario (1-12)']
+  Anio int [not null, note: 'Anio del calendario. Nivel principal de los analisis por rango de anos']
+
+  Note: '''
+    Dimension Fecha generada por el ETL. Contiene dia, mes y anio, que son
+    los niveles usados por los analisis del caso. La fecha de la oferta
+    proviene de F3 y se normaliza a YYYY-MM-DD antes de resolver ID_Fecha.
+
+    Miembro 0: ID_Fecha = 0 (Desconocido / No aplica), con fecha tecnica
+    para cubrir fechas no resolubles. No se agregan atributos de calendario
+    no sustentados por el caso.
+  '''
+}
+
+Table Dim_Proveedor {
+  ID_Proveedor int [pk, note: 'Llave subrogada. Miembro 0 = Desconocido / No aplica']
+  IdProveedor varchar [not null, unique, note: 'Llave natural. Origen: F3.idProveedor_T (identificador del proveedor del plan)']
+
+  Note: '''
+    Dimension Proveedor, SCD Tipo 1: las fuentes F1 a F4 no muestran cambios
+    en sus atributos. Solo existe el identificador del proveedor en F3; no
+    hay tabla de proveedores ni nombre en el diccionario. Por eso NO se
+    conserva NombreProveedor.
+
+    El analisis 1.a se resuelve por identificador de proveedor. No se crea
+    un atributo de grupo de proveedores: el grupo lo define el usuario en la
+    consulta.
+
+    Miembro 0: IdProveedor = '0' (Desconocido / No aplica).
+  '''
+}
+
+Table Dim_Plan {
+  ID_Plan int [pk, note: 'Llave subrogada. Miembro 0 = Desconocido / No aplica']
+  IdPlan varchar [not null, unique, note: 'Llave natural. Origen: F3.idPlan_T (identificador del plan)']
+
+  Note: '''
+    Dimension Plan, SCD Tipo 1: las fuentes no muestran cambios en sus
+    atributos. F1 a F4 solo aportan el identificador del plan; no existen
+    atributos descriptivos que puedan agregarse sin inventar informacion.
+
+    Miembro 0: IdPlan = '0' (Desconocido / No aplica).
+  '''
+}
+
+Table Dim_TipoBeneficio {
+  ID_TipoBeneficio int [pk, note: 'Llave subrogada de la version anual. Miembro 0 = Desconocido / No aplica']
+  IdTipoBeneficio varchar [not null, note: 'Llave natural. Origen: F2.idTipoBeneficio_T. Unica junto con AnioVigencia']
+  Nombre varchar [not null, note: 'Origen: F2.Nombre (nombre del tipo de beneficio)']
+  UnidadDelLimite varchar [note: 'Origen: F2.UnidadDelLimite (unidad en la que se expresa el limite)']
+  EsEHB varchar(3) [not null, note: 'Origen: F2.EsEHB (es beneficio esencial de salud). Valores Yes / No']
+  EstaCubiertoPorSeguro varchar(3) [not null, note: 'Origen: F2.EstaCubiertoPorSeguro. Valores Yes / No']
+  TieneLimiteCuantitativo varchar(3) [not null, note: 'Origen: F2.TieneLimiteCuantitativo. Valores Yes / No']
+  ExcluidoDelDesembolsoMaximoDentroDeLaRed varchar(3) [not null, note: 'Origen: F2.ExcluidoDelDesembolsoMaximoDentroDeLaRed. Valores Yes / No']
+  ExcluidoDelDesembolsoMaximoFueraDeLaRed varchar(3) [not null, note: 'Origen: F2.ExcluidoDelDesembolsoMaximoFueraDeLaRed. Valores Yes / No']
+  AnioVigencia int [not null, note: 'Anio de vigencia derivado de F2.Fecha. Unico junto con IdTipoBeneficio']
+  FechaInicioVigencia date [not null, note: 'Inicio de vigencia anual derivado de F2.Fecha']
+  FechaFinVigencia date [not null, note: 'Fin de vigencia anual derivado de F2.Fecha']
+  EsVersionActual varchar(3) [not null, note: 'Yes / No. Indica la version mas reciente; no se usa para asociar el hecho']
+
+  indexes {
+    (IdTipoBeneficio, AnioVigencia) [unique, name: 'UQ_Dim_TipoBeneficio_Natural_Anio']
+  }
+
+  Note: '''
+    Dimension Tipo de Beneficio, SCD Tipo 2 con vigencia anual (R4). La
+    regla de negocio 5 garantiza un solo valor de atributos y unidad de
+    limite por tipo de beneficio y por ano.
+
+    Vigencias: AnioVigencia, FechaInicioVigencia y FechaFinVigencia se
+    derivan del campo Fecha de F2. El hecho se asocia con la version cuyo
+    AnioVigencia coincide con el anio de la oferta, NO con EsVersionActual.
+    Unir por la llave natural duplicaria filas; el hecho usa la llave
+    subrogada de la version vigente.
+
+    Atributos trazables (R7): se reemplaza el atributo ambiguo Condiciones
+    por los campos reales de F2 (EsEHB, EstaCubiertoPorSeguro,
+    TieneLimiteCuantitativo y los dos ExcluidoDelDesembolsoMaximo...).
+    Nombre y UnidadDelLimite conservan los nombres de la fuente.
+
+    Miembro 0: IdTipoBeneficio = '0', AnioVigencia = 0, con vigencias
+    tecnicas 1900-01-01 a 9999-12-31.
+  '''
+}
+
+Table Dim_AreaDeServicio {
+  ID_AreaDeServicio int [pk, note: 'Llave subrogada de la version anual. Miembro 0 = Desconocido / No aplica']
+  IdAreaDeServicio varchar [not null, note: 'Llave natural. Origen: F1.idAreaServicio_T. Unica junto con AnioVigencia']
+  NombreAreaDeServicio varchar [not null, note: 'Origen: F1.NombreAreaDeServicio (nombre del area de servicio)']
+  Estado varchar [note: 'Origen: F1.Estado (nombre del estado del area). El estado del condado esta en Dim_Geografia']
+  AnioVigencia int [not null, note: 'Anio de vigencia derivado de F1.Fecha. Unico junto con IdAreaDeServicio']
+  FechaInicioVigencia date [not null, note: 'Inicio de vigencia anual derivado de F1.Fecha']
+  FechaFinVigencia date [not null, note: 'Fin de vigencia anual derivado de F1.Fecha']
+  EsVersionActual varchar(3) [not null, note: 'Yes / No. Indica la version mas reciente; no se usa para asociar el hecho']
+
+  indexes {
+    (IdAreaDeServicio, AnioVigencia) [unique, name: 'UQ_Dim_AreaDeServicio_Natural_Anio']
+  }
+
+  Note: '''
+    Dimension Area de Servicio, SCD Tipo 2 con vigencia anual (R4). Las
+    vigencias se derivan del campo Fecha de F1. El hecho se asocia con la
+    version cuyo AnioVigencia coincide con el anio de la oferta, NO con
+    EsVersionActual.
+
+    No se agregan Condado ni PoblacionAct a esta dimension: F1 relaciona
+    cada area con varios condados y agregarlos aqui romperia una fila por
+    area. Esos atributos estan en Dim_Geografia y se enlazan por
+    Puente_AreaGeografia con cada version de area (R1).
+
+    Carga (R8): se carga el universo completo de F1, no solo las areas con
+    ofertas, para que 2.a, 2.b y 2.c midan la cobertura real. Las areas de
+    F3 que no existen en F1 se asignan al miembro 0 (IdAreaDeServicio = '0').
+
+    Miembro 0: IdAreaDeServicio = '0', AnioVigencia = 0, con vigencias
+    tecnicas 1900-01-01 a 9999-12-31; se enlaza con ID_Geografia = 0.
+  '''
+}
+
+Table Dim_CondicionPago {
+  ID_CondicionPago int [pk, note: 'Llave subrogada. Miembro 0 = Desconocido / No aplica']
+  IdCondicionPago varchar [not null, unique, note: 'Llave natural. Origen: F4.idCondicionesDePago_T (identificador de la condicion de pago)']
+  TipoCondicion varchar [not null, note: 'Origen: F4.Tipo. Solo Copago o Coseguro para las filas de negocio; los registros Anticipado no se cargan']
+  Descripcion varchar [note: 'Origen: F4.Descripcion (descripcion de la condicion de pago)']
+
+  Note: '''
+    Dimension Condicion de Pago, SCD Tipo 1: F4 no muestra cambios en sus
+    atributos. Se usa con dos roles en el hecho: ID_CondicionCopago y
+    ID_CondicionCoseguro (R3).
+
+    TipoCondicion solo admite Copago o Coseguro. Los registros Anticipado
+    de F4 no se cargan, segun la indicacion de RaSa. El esquema por si solo
+    no garantiza la correspondencia rol-tipo, por lo que la carga valida
+    que ID_CondicionCopago apunte a una fila de tipo Copago y
+    ID_CondicionCoseguro a una fila de tipo Coseguro.
+
+    Miembro 0: IdCondicionPago = '0' (Desconocido / No aplica). Es un
+    registro tecnico; la restriccion Copago/Coseguro aplica a las filas
+    cargadas desde F4.
+  '''
+}
+
+Table Dim_Geografia {
+  ID_Geografia int [pk, note: 'Llave subrogada. Miembro 0 = Desconocido / No aplica']
+  IdGeografia varchar [not null, unique, note: 'Llave natural. Origen: F1.idGeografia_T (identificador del condado)']
+  Condado varchar [not null, note: 'Origen: F1.Condado (nombre del condado)']
+  Estado varchar [not null, note: 'Origen: F1.Estado (nombre del estado del condado)']
+  PoblacionAct bigint [note: 'Origen: F1.PoblacionAct (numero de habitantes actuales). No es historica por ano']
+  AreaMillasCuadradas decimal(14,2) [note: 'Origen: F1.Area (area en millas cuadradas)']
+  Densidad decimal(14,2) [note: 'Origen: F1.Densidad (numero de habitantes por milla cuadrada)']
+
+  Note: '''
+    Dimension Geografia, SCD Tipo 1 (R1). Representa el condado de F1:
+    IdGeografia (idGeografia_T), Condado, Estado, PoblacionAct,
+    AreaMillasCuadradas (Area) y Densidad.
+
+    No se agregan Condado ni PoblacionAct directamente a
+    Dim_AreaDeServicio porque un area cubre varios condados. La composicion
+    de cada area se resuelve con Puente_AreaGeografia, que asocia cada
+    version de area con sus condados.
+
+    PoblacionAct es la poblacion actual de F1, no la del anio analizado.
+    Por eso 3.b se resuelve con la poblacion actual y debe interpretarse
+    como una referencia, no como historia. La regla 1 del caso indica que
+    las areas no cubren todos los condados del pais; el universo geografico
+    es el de las areas y condados modelados.
+
+    Miembro 0: IdGeografia = '0' (Desconocido / No aplica), usado por el
+    area 0.
+  '''
+}
+
+// ----------------------------------------------------------------------------
+// PUENTE
+// ----------------------------------------------------------------------------
+
+Table Puente_AreaGeografia {
+  ID_AreaDeServicio int [not null, note: 'FK a la version anual de Dim_AreaDeServicio']
+  ID_Geografia int [not null, note: 'FK a Dim_Geografia']
+
+  indexes {
+    (ID_AreaDeServicio, ID_Geografia) [pk]
+  }
+
+  Note: '''
+    Puente entre la version de area de servicio y sus condados (R1). Grano:
+    una fila por version de area y condado. F1 relaciona cada area con un
+    condado, de modo que un area cubre varios condados; esta tabla conserva
+    esa composicion asociada a la version vigente en cada ano.
+
+    Permite responder 3.a por condado y 3.b con la poblacion de
+    Dim_Geografia. El area 0 se enlaza con la geografia 0 para no perder
+    ofertas sin area; los analisis de cobertura y concentracion deben
+    excluir el miembro 0.
+  '''
+}
+
+// ----------------------------------------------------------------------------
+// HECHO
+// ----------------------------------------------------------------------------
+
+Table Hecho_OfertaPlanes {
+  ID_OfertaPlanes bigint [pk, note: 'PK tecnica de la fila. No es el grano']
+  ID_Fecha int [not null, note: 'FK a Dim_Fecha. Fecha de la oferta (proceso anual)']
+  ID_Proveedor int [not null, note: 'FK a Dim_Proveedor (rol proveedor)']
+  ID_Plan int [not null, note: 'FK a Dim_Plan (rol plan)']
+  ID_TipoBeneficio int [not null, note: 'FK a Dim_TipoBeneficio. Version cuyo AnioVigencia coincide con el anio de la oferta']
+  ID_AreaDeServicio int [not null, note: 'FK a Dim_AreaDeServicio. Version cuyo AnioVigencia coincide con el anio de la oferta; area 0 si es desconocida']
+  ID_CondicionCopago int [not null, note: 'FK a Dim_CondicionPago, rol copago. Debe apuntar a una fila de TipoCondicion = Copago']
+  ID_CondicionCoseguro int [not null, note: 'FK a Dim_CondicionPago, rol coseguro. Debe apuntar a una fila de TipoCondicion = Coseguro']
+  IdNivelServicio varchar [not null, note: 'Dimension degenerada. Origen: F3.idNivelServicio_T (identificador del nivel de servicio). F1 a F4 no traen atributos descriptivos del nivel']
+  ValorCopago decimal(14,2) [not null, note: 'Origen: F3.valorCopago. Medida NO aditiva; agregacion valida: AVG, MIN, MAX; no usar SUM']
+  ValorCoseguro decimal(14,2) [not null, note: 'Origen: F3.valorCoseguro. Medida NO aditiva; agregacion valida: AVG, MIN, MAX; no usar SUM']
+  LimiteCuantitativo decimal(14,2) [not null, note: 'Origen: F3.cantidadLimite. Medida NO aditiva; agregacion valida: AVG, MIN, MAX. Valor 333 por defecto si viene vacio o cero']
+  EsLimitePorDefecto varchar(3) [not null, note: 'Yes cuando LimiteCuantitativo se reemplazo por 333; No cuando es un limite real']
+  CantidadOfertas integer [not null, default: 1, note: 'Medida aditiva; vale 1 por fila del grano. Cuenta filas, no planes distintos']
+
+  indexes {
+    (ID_Fecha, ID_Plan, ID_TipoBeneficio, ID_AreaDeServicio, IdNivelServicio) [unique, name: 'UQ_Hecho_OfertaPlanes_Grano']
+  }
+
+  Note: '''
+    GRANO (R2): una fila por plan, tipo de beneficio, area de servicio y
+    nivel de servicio ofrecido en una fecha de oferta (proceso anual).
+
+    La PK tecnica es ID_OfertaPlanes y la restriccion unica sobre el grano
+    es (ID_Fecha, ID_Plan, ID_TipoBeneficio, ID_AreaDeServicio,
+    IdNivelServicio). IdNivelServicio es una dimension degenerada porque
+    F1 a F4 no traen atributos descriptivos del nivel de servicio.
+
+    El hecho toma la llave subrogada de la version de Dim_TipoBeneficio y
+    de Dim_AreaDeServicio cuyo AnioVigencia coincide con el anio de la
+    oferta, NO la version marcada con EsVersionActual.
+
+    Medidas (R5):
+      - ValorCopago, ValorCoseguro y LimiteCuantitativo son decimal(14,2)
+        y NO aditivas: su agregacion valida es promedio, minimo y maximo.
+      - CantidadOfertas es integer y aditiva: cuenta filas del grano, no
+        planes distintos.
+      - Los planes se cuentan con COUNT(DISTINCT ID_Plan).
+      - La diferencia porcentual de 1.a es una medida derivada que se
+        calcula en las consultas y no se almacena.
+
+    Roles de condicion de pago (R3): la carga valida que ID_CondicionCopago
+    apunte a una fila de tipo Copago y ID_CondicionCoseguro a una fila de
+    tipo Coseguro. El esquema por si solo no lo garantiza.
+
+    Reglas de carga (R8): limite 333 por defecto marcado con
+    EsLimitePorDefecto; maximos de 2018 (copago 3500 y coseguro 100);
+    fechas normalizadas a YYYY-MM-DD; eliminacion de duplicados en todas
+    las fuentes; el hecho no usa llaves nulas y el miembro 0 cubre los
+    valores desconocidos o no aplicables.
+  '''
+}
+
+// ----------------------------------------------------------------------------
+// RELACIONES
+// Cardinalidad: muchos hechos por cada fila de dimension (N:1).
+// ----------------------------------------------------------------------------
+
+// Hecho -> dimensiones
+Ref e0_plan: Hecho_OfertaPlanes.ID_Plan > Dim_Plan.ID_Plan
+Ref e1_tipo_beneficio: Hecho_OfertaPlanes.ID_TipoBeneficio > Dim_TipoBeneficio.ID_TipoBeneficio
+Ref e2_copago: Hecho_OfertaPlanes.ID_CondicionCopago > Dim_CondicionPago.ID_CondicionPago
+Ref e3_coseguro: Hecho_OfertaPlanes.ID_CondicionCoseguro > Dim_CondicionPago.ID_CondicionPago
+Ref e4_fecha: Hecho_OfertaPlanes.ID_Fecha > Dim_Fecha.ID_Fecha
+Ref e5_proveedor: Hecho_OfertaPlanes.ID_Proveedor > Dim_Proveedor.ID_Proveedor
+Ref e6_area: Hecho_OfertaPlanes.ID_AreaDeServicio > Dim_AreaDeServicio.ID_AreaDeServicio
+
+// Puente -> dimensiones
+Ref p1_area: Puente_AreaGeografia.ID_AreaDeServicio > Dim_AreaDeServicio.ID_AreaDeServicio
+Ref p2_geografia: Puente_AreaGeografia.ID_Geografia > Dim_Geografia.ID_Geografia

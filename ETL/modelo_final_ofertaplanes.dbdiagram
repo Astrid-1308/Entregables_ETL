@@ -1,0 +1,70 @@
+{
+  "version": "3.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "currentViewName": null,
+  "defaultView": {
+    "detailLevel": "All",
+    "relationshipMode": "All",
+    "tablePositions": [
+      {
+        "name": "Dim_Fecha",
+        "schemaName": "public",
+        "x": 477.1169485426413,
+        "y": 733.5833033465276
+      },
+      {
+        "name": "Dim_Proveedor",
+        "schemaName": "public",
+        "x": 397.29759275059604,
+        "y": 1008.5318459877656
+      },
+      {
+        "name": "Dim_Plan",
+        "schemaName": "public",
+        "x": 435.821518531846,
+        "y": 1207.0413817920116
+      },
+      {
+        "name": "Dim_TipoBeneficio",
+        "schemaName": "public",
+        "x": 809.6538323137822,
+        "y": 277.53364519611375
+      },
+      {
+        "name": "Dim_AreaDeServicio",
+        "schemaName": "public",
+        "x": 1459.5134940626128,
+        "y": 854.1245052177044
+      },
+      {
+        "name": "Dim_CondicionPago",
+        "schemaName": "public",
+        "x": 444.51529327096074,
+        "y": 1374.747750989565
+      },
+      {
+        "name": "Dim_Geografia",
+        "schemaName": "public",
+        "x": 1486.329076788245,
+        "y": 1326.747750989565
+      },
+      {
+        "name": "Puente_AreaGeografia",
+        "schemaName": "public",
+        "x": 1514.622533819495,
+        "y": 1176.9924433249373
+      },
+      {
+        "name": "Hecho_OfertaPlanes",
+        "schemaName": "public",
+        "x": 947.7310165948857,
+        "y": 910.0158908139183
+      }
+    ],
+    "tableGroupCollapseStates": [],
+    "stickyNoteLayouts": [],
+    "referencePaths": []
+  },
+  "views": {}
+}

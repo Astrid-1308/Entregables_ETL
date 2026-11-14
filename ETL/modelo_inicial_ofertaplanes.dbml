@@ -1,0 +1,203 @@
+// ============================================================================
+// Modelo OfertaPlanes - RaSa
+// Fuente: modelo_ofertaplanes.drawio (diagrama "Modelo OfertaPlanes", id="0")
+//
+// Representación DBML equivalente al diagrama. Se conservan las 7 entidades,
+// sus atributos, las 7 relaciones (todas Hecho -> Dimensión), los roles
+// "copago" / "coseguro" y los atributos asociados a historia (SCD) tal como
+// aparecen. No se corrigieron, agregaron ni eliminaron elementos del modelo.
+//
+// Aclaraciones de fidelidad:
+// - El diagrama NO declara tipos de dato. Para satisfacer la sintaxis de DBML
+//   se usa VARCHAR en todas las columnas; no implica una decisión de tipado.
+// - Las aristas usan startArrow=ERmany en Hecho_OfertaPlanes y
+//   endArrow=ERmandOne en la dimensión: se representan como many-to-one (>).
+// - El diagrama NO marca explícitamente columnas FK. Las columnas ID_* del
+//   hecho se relacionan según las aristas existentes.
+// - No fue necesario crear identificadores técnicos: todas las relaciones se
+//   expresan con columnas que ya existen en el diagrama.
+// ============================================================================
+
+Project Modelo_OfertaPlanes {
+  database_type: 'No especificado en el diagrama'
+  Note: '''
+    Modelo dimensional OfertaPlanes (RaSa): un hecho (Hecho_OfertaPlanes)
+    y seis dimensiones (Dim_Plan, Dim_TipoBeneficio, Dim_CondicionPago,
+    Dim_Fecha, Dim_Proveedor, Dim_AreaDeServicio).
+
+    Roles de dimensión conservados: Dim_CondicionPago participa dos veces,
+    una por el rol "copago" (arista e2) y otra por el rol "coseguro"
+    (arista e3). No se creó una dimensión adicional para el segundo rol.
+
+    Historia (SCD): Dim_TipoBeneficio y Dim_AreaDeServicio contienen
+    FechaInicio, FechaFin y EsActual. El diagrama no rotula "SCD"; la
+    clasificación se documenta solo a partir de esos atributos presentes.
+
+    Ambigüedades observadas (documentadas, no resueltas):
+    1. Las dimensiones declaran dos identificadores (ID_<Dim> (PK) e
+       Id<Dim>) sin indicar cuál es clave sustituta, cuál es clave de
+       negocio, ni a cuál de ellos referencia el hecho.
+    2. Dim_Plan no tiene atributos descriptivos; se conserva así.
+    3. Dim_CondicionPago se llama "CondicionPago" pero el hecho referencia
+       ID_CondicionCopago e ID_CondicionCoseguro; se conserva la intención
+       observable del diagrama.
+    4. No hay relación entre Dim_Fecha y los atributos FechaInicio/FechaFin
+       de las dimensiones con historia; no se agregó ninguna.
+  '''
+}
+
+// ----------------------------------------------------------------------------
+// DIMENSIONES
+// ----------------------------------------------------------------------------
+
+Table Dim_Plan {
+  ID_Plan varchar [pk, note: 'Declarado como "ID_Plan (PK)" en el diagrama']
+  IdPlan   varchar [note: 'Atributo tal como aparece; el diagrama no indica su naturaleza (clave de negocio u otra)']
+
+  Note: '''
+    Dimensión Plan. Contiene únicamente los dos atributos identificadores
+    mostrados en el diagrama; no se agregan atributos descriptivos.
+
+    Ambigüedad: el diagrama no especifica la diferencia entre ID_Plan e
+    IdPlan ni cuál de los dos es referenciado por Hecho_OfertaPlanes.ID_Plan.
+  '''
+}
+
+Table Dim_TipoBeneficio {
+  ID_TipoBeneficio varchar [pk, note: 'Declarado como "ID_TipoBeneficio (PK)" en el diagrama']
+  IdTipoBeneficio  varchar [note: 'Atributo tal como aparece; naturaleza no especificada en el diagrama']
+  NombreBeneficio  varchar
+  Condiciones      varchar
+  UnidadLimite     varchar
+  FechaInicio      varchar [note: 'Inicio de vigencia del registro; marcador de historia (SCD)']
+  FechaFin         varchar [note: 'Fin de vigencia del registro; marcador de historia (SCD)']
+  EsActual         varchar [note: 'Indicador de registro vigente; marcador de historia (SCD)']
+
+  Note: '''
+    Historia (SCD): incluye FechaInicio, FechaFin y EsActual, compatibles
+    con una dimensión con historia (SCD Tipo 2). El diagrama no rotula el
+    tipo de SCD; solo se conservan los atributos presentes.
+
+    Ambigüedad: no se indica cuál de los dos identificadores es la clave
+    sustituta y cuál la clave de negocio, ni cuál referencia el hecho.
+  '''
+}
+
+Table Dim_CondicionPago {
+  ID_CondicionPago varchar [pk, note: 'Declarado como "ID_CondicionPago (PK)" en el diagrama']
+  IdCondicionPago  varchar [note: 'Atributo tal como aparece; naturaleza no especificada en el diagrama']
+  TipoCondicion    varchar
+  Descripcion      varchar
+
+  Note: '''
+    Dimensión con dos roles en el modelo: "copago" (arista e2) y
+    "coseguro" (arista e3). Una misma fila puede ser referenciada por las
+    columnas ID_CondicionCopago e ID_CondicionCoseguro del hecho.
+
+    Ambigüedad observada: el nombre de la dimensión es CondicionPago
+    mientras el hecho referencia CondicionCopago/CondicionCoseguro; no se
+    corrige, se conserva la intención observable del diagrama.
+  '''
+}
+
+Table Dim_Fecha {
+  ID_Fecha varchar [pk, note: 'Declarado como "ID_Fecha (PK)" en el diagrama']
+  Fecha    varchar
+  Dia      varchar
+  Mes      varchar
+  Anio     varchar
+
+  Note: '''
+    Dimensión Fecha. El diagrama solo la relaciona con el hecho mediante
+    Hecho_OfertaPlanes.ID_Fecha; no hay otras relaciones que conservar.
+  '''
+}
+
+Table Dim_Proveedor {
+  ID_Proveedor   varchar [pk, note: 'Declarado como "ID_Proveedor (PK)" en el diagrama']
+  IdProveedor    varchar [note: 'Atributo tal como aparece; naturaleza no especificada en el diagrama']
+  NombreProveedor varchar
+
+  Note: '''
+    Sin marcadores de historia en el diagrama.
+
+    Ambigüedad: no se indica cuál de los dos identificadores es la clave
+    sustituta y cuál la clave de negocio, ni cuál referencia el hecho.
+  '''
+}
+
+Table Dim_AreaDeServicio {
+  ID_AreaDeServicio varchar [pk, note: 'Declarado como "ID_AreaDeServicio (PK)" en el diagrama']
+  IdAreaDeServicio  varchar [note: 'Atributo tal como aparece; naturaleza no especificada en el diagrama']
+  NombreArea        varchar
+  Estado            varchar
+  FechaInicio       varchar [note: 'Inicio de vigencia del registro; marcador de historia (SCD)']
+  FechaFin          varchar [note: 'Fin de vigencia del registro; marcador de historia (SCD)']
+  EsActual          varchar [note: 'Indicador de registro vigente; marcador de historia (SCD)']
+
+  Note: '''
+    Historia (SCD): incluye FechaInicio, FechaFin y EsActual, compatibles
+    con una dimensión con historia (SCD Tipo 2). El diagrama no rotula el
+    tipo de SCD; solo se conservan los atributos presentes.
+
+    Ambigüedad: no se indica cuál de los dos identificadores es la clave
+    sustituta y cuál la clave de negocio, ni cuál referencia el hecho.
+  '''
+}
+
+// ----------------------------------------------------------------------------
+// HECHO
+// ----------------------------------------------------------------------------
+
+Table Hecho_OfertaPlanes {
+  ID_OfertaPlanes     varchar [pk, note: 'Declarado como "ID_OfertaPlanes (PK)" en el diagrama']
+  ID_Fecha            varchar [note: 'FK según arista e4 hacia Dim_Fecha (el diagrama no marca FK explícitamente)']
+  ID_Proveedor        varchar [note: 'FK según arista e5 hacia Dim_Proveedor (el diagrama no marca FK explícitamente)']
+  ID_Plan             varchar [note: 'FK según arista e0 hacia Dim_Plan (el diagrama no marca FK explícitamente)']
+  ID_TipoBeneficio    varchar [note: 'FK según arista e1 hacia Dim_TipoBeneficio (el diagrama no marca FK explícitamente)']
+  ID_AreaDeServicio   varchar [note: 'FK según arista e6 hacia Dim_AreaDeServicio (el diagrama no marca FK explícitamente)']
+  ID_CondicionCopago  varchar [note: 'FK con rol "copago" según arista e2 hacia Dim_CondicionPago']
+  ID_CondicionCoseguro varchar [note: 'FK con rol "coseguro" según arista e3 hacia Dim_CondicionPago']
+  ValorCopago         varchar
+  ValorCoseguro       varchar
+  LimiteCuantitativo  varchar
+  CantidadOfertas     varchar
+
+  Note: '''
+    Tabla de hechos con 7 referencias a dimensiones, dos de ellas al mismo
+    tiempo a Dim_CondicionPago con roles distintos (copago y coseguro).
+
+    Ambigüedad: el diagrama no declara nullability ni obligatoriedad de las
+    columnas del hecho; las aristas solo indican ERmany en el hecho y
+    ERmandOne en la dimensión.
+  '''
+}
+
+// ----------------------------------------------------------------------------
+// RELACIONES (aristas del diagrama)
+// Cardinalidad observada: ERmany en Hecho_OfertaPlanes, ERmandOne en dimensión
+// -> many-to-one. En DBML el lado izquierdo es "muchos" y el derecho "uno".
+// ----------------------------------------------------------------------------
+
+// e0: Hecho_OfertaPlanes -> Dim_Plan
+Ref e0: Hecho_OfertaPlanes.ID_Plan > Dim_Plan.ID_Plan
+
+// e1: Hecho_OfertaPlanes -> Dim_TipoBeneficio
+Ref e1: Hecho_OfertaPlanes.ID_TipoBeneficio > Dim_TipoBeneficio.ID_TipoBeneficio
+
+// e2: Hecho_OfertaPlanes -> Dim_CondicionPago  (rol: copago)
+Ref e2_copago: Hecho_OfertaPlanes.ID_CondicionCopago > Dim_CondicionPago.ID_CondicionPago
+
+// e3: Hecho_OfertaPlanes -> Dim_CondicionPago  (rol: coseguro)
+// Misma dimensión destino que e2; se distingue únicamente por el rol y la
+// columna FK, tal como se observa en el diagrama.
+Ref e3_coseguro: Hecho_OfertaPlanes.ID_CondicionCoseguro > Dim_CondicionPago.ID_CondicionPago
+
+// e4: Hecho_OfertaPlanes -> Dim_Fecha
+Ref e4: Hecho_OfertaPlanes.ID_Fecha > Dim_Fecha.ID_Fecha
+
+// e5: Hecho_OfertaPlanes -> Dim_Proveedor
+Ref e5: Hecho_OfertaPlanes.ID_Proveedor > Dim_Proveedor.ID_Proveedor
+
+// e6: Hecho_OfertaPlanes -> Dim_AreaDeServicio
+Ref e6: Hecho_OfertaPlanes.ID_AreaDeServicio > Dim_AreaDeServicio.ID_AreaDeServicio

@@ -1,0 +1,94 @@
+<mxfile host="65bd71144e">
+    <diagram name="Modelo final OfertaPlanes" id="final">
+        <mxGraphModel dx="1408" dy="1033" grid="1" gridSize="8" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1320" pageHeight="1040" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="titulo" parent="1" style="text;html=1;fontSize=16;fontStyle=1;align=left;" value="Modelo final OfertaPlanes - RaSa" vertex="1">
+                    <mxGeometry height="24" width="600" x="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="plan" parent="1" style="swimlane;fontStyle=1;fontSize=13;align=center;startSize=30;html=1;rounded=1;arcSize=8;fillColor=#ffffff;strokeColor=#000000;swimlaneFillColor=#ffffff;" value="Dim_Plan" vertex="1">
+                    <mxGeometry height="72" width="200" x="40" y="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="plan_t" parent="plan" style="text;html=1;align=center;verticalAlign=top;spacingTop=2;whiteSpace=wrap;fontSize=12;" value="ID_Plan (PK)&lt;br&gt;IdPlan" vertex="1">
+                    <mxGeometry height="42" width="200" y="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="tben" parent="1" style="swimlane;fontStyle=1;fontSize=13;align=center;startSize=30;html=1;rounded=1;arcSize=8;fillColor=#ffffff;strokeColor=#000000;swimlaneFillColor=#ffffff;" value="Dim_TipoBeneficio" vertex="1">
+                    <mxGeometry height="267" width="340" x="300" y="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="tben_t" parent="tben" style="text;html=1;align=center;verticalAlign=top;spacingTop=2;whiteSpace=wrap;fontSize=12;fontColor=light-dark(#000000,#FFFFFF);" value="ID_TipoBeneficio (PK)&lt;br&gt;IdTipoBeneficio&lt;br&gt;Nombre&lt;br&gt;UnidadDelLimite&lt;br&gt;EsEHB&lt;br&gt;EstaCubiertoPorSeguro&lt;br&gt;TieneLimiteCuantitativo&lt;br&gt;ExcluidoDelDesembolsoMaximoDentroDeLaRed&lt;br&gt;ExcluidoDelDesembolsoMaximoFueraDeLaRed&lt;br&gt;AnioVigencia&lt;br&gt;FechaInicioVigencia&lt;br&gt;FechaFinVigencia&lt;br&gt;EsVersionActual&lt;br&gt;&lt;br&gt;&lt;i&gt;&lt;font style=&quot;font-size:10px&quot;&gt;)&lt;/font&gt;&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="237" width="340" y="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="cond" parent="1" style="swimlane;fontStyle=1;fontSize=13;align=center;startSize=30;html=1;rounded=1;arcSize=8;fillColor=#ffffff;strokeColor=#000000;swimlaneFillColor=#ffffff;" value="Dim_CondicionPago" vertex="1">
+                    <mxGeometry height="117" width="220" x="720" y="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="cond_t" parent="cond" style="text;html=1;align=center;verticalAlign=top;spacingTop=2;whiteSpace=wrap;fontSize=12;fontColor=light-dark(#000000,#FFFFFF);" value="ID_CondicionPago (PK)&lt;br&gt;IdCondicionPago&lt;br&gt;TipoCondicion (Copago / Coseguro)&lt;br&gt;Descripcion&lt;br&gt;&lt;i&gt;&lt;font style=&quot;font-size:10px&quot;&gt;SCD Tipo 1&lt;/font&gt;&lt;/i&gt;" vertex="1">
+                    <mxGeometry height="87" width="220" y="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="fecha" parent="1" style="swimlane;fontStyle=1;fontSize=13;align=center;startSize=30;html=1;rounded=1;arcSize=8;fillColor=#ffffff;strokeColor=#000000;swimlaneFillColor=#ffffff;" value="Dim_Fecha" vertex="1">
+                    <mxGeometry height="117" width="200" x="40" y="470" as="geometry"/>
+                </mxCell>
+                <mxCell id="fecha_t" parent="fecha" style="text;html=1;align=center;verticalAlign=top;spacingTop=2;whiteSpace=wrap;fontSize=12;" value="ID_Fecha (PK)&lt;br&gt;Fecha&lt;br&gt;Dia&lt;br&gt;Mes&lt;br&gt;Anio" vertex="1">
+                    <mxGeometry height="87" width="200" y="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="hof" parent="1" style="swimlane;fontStyle=1;fontSize=13;align=center;startSize=30;html=1;rounded=1;arcSize=8;fillColor=#ffffff;strokeColor=#000000;swimlaneFillColor=#ffffff;" value="Hecho_OfertaPlanes" vertex="1">
+                    <mxGeometry height="282" width="280" x="340" y="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="hof_t" parent="hof" style="text;html=1;align=center;verticalAlign=top;spacingTop=2;whiteSpace=wrap;fontSize=12;fontColor=light-dark(#000000,#FFFFFF);" value="ID_OfertaPlanes (PK)&lt;br&gt;ID_Fecha&lt;br&gt;ID_Proveedor&lt;br&gt;ID_Plan&lt;br&gt;ID_TipoBeneficio&lt;br&gt;ID_AreaDeServicio&lt;br&gt;ID_CondicionCopago&lt;br&gt;ID_CondicionCoseguro&lt;br&gt;&lt;b&gt;IdNivelServicio (DD)&lt;/b&gt;&lt;br&gt;ValorCopago&lt;br&gt;ValorCoseguro&lt;br&gt;LimiteCuantitativo&lt;br&gt;&lt;b&gt;EsLimitePorDefecto&lt;/b&gt;&lt;br&gt;CantidadOfertas&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+                    <mxGeometry height="252" width="280" y="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="prov" parent="1" style="swimlane;fontStyle=1;fontSize=13;align=center;startSize=30;html=1;rounded=1;arcSize=8;fillColor=#ffffff;strokeColor=#000000;swimlaneFillColor=#ffffff;" value="Dim_Proveedor" vertex="1">
+                    <mxGeometry height="102" width="200" x="740" y="490" as="geometry"/>
+                </mxCell>
+                <mxCell id="prov_t" parent="prov" style="text;html=1;align=center;verticalAlign=top;spacingTop=2;whiteSpace=wrap;fontSize=12;fontColor=light-dark(#000000,#FFFFFF);" value="ID_Proveedor (PK)&lt;br&gt;IdProveedor&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+                    <mxGeometry height="72" width="200" y="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="area" parent="1" style="swimlane;fontStyle=1;fontSize=13;align=center;startSize=30;html=1;rounded=1;arcSize=8;fillColor=#ffffff;strokeColor=#000000;swimlaneFillColor=#ffffff;" value="Dim_AreaDeServicio" vertex="1">
+                    <mxGeometry height="192" width="280" x="340" y="790" as="geometry"/>
+                </mxCell>
+                <mxCell id="area_t" parent="area" style="text;html=1;align=center;verticalAlign=top;spacingTop=2;whiteSpace=wrap;fontSize=12;fontColor=light-dark(#000000,#FFFFFF);" value="ID_AreaDeServicio (PK)&lt;br&gt;IdAreaDeServicio&lt;br&gt;NombreAreaDeServicio&lt;br&gt;Estado&lt;br&gt;&lt;b&gt;AnioVigencia&lt;/b&gt;&lt;br&gt;FechaInicioVigencia&lt;br&gt;FechaFinVigencia&lt;br&gt;EsVersionActual&lt;br&gt;" vertex="1">
+                    <mxGeometry height="162" width="280" y="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="pte" parent="1" style="swimlane;fontStyle=1;fontSize=13;align=center;startSize=30;html=1;rounded=1;arcSize=8;swimlaneFillColor=#ffffff;" value="Puente_AreaGeografia" vertex="1">
+                    <mxGeometry height="87" width="220" x="720" y="830" as="geometry"/>
+                </mxCell>
+                <mxCell id="pte_t" parent="pte" style="text;html=1;align=center;verticalAlign=top;spacingTop=2;whiteSpace=wrap;fontSize=12;fontColor=light-dark(#000000,#FFFFFF);" value="ID_AreaDeServicio (PK, FK)&lt;br&gt;ID_Geografia (PK, FK)&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+                    <mxGeometry height="57" width="220" y="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="geo" parent="1" style="swimlane;fontStyle=1;fontSize=13;align=center;startSize=30;html=1;rounded=1;arcSize=8;swimlaneFillColor=#ffffff;" value="Dim_Geografia" vertex="1">
+                    <mxGeometry height="162" width="220" x="1020" y="790" as="geometry"/>
+                </mxCell>
+                <mxCell id="geo_t" parent="geo" style="text;html=1;align=center;verticalAlign=top;spacingTop=2;whiteSpace=wrap;fontSize=12;fontColor=light-dark(#000000,#FFFFFF);" value="ID_Geografia (PK)&lt;br&gt;IdGeografia&lt;br&gt;Condado&lt;br&gt;Estado&lt;br&gt;PoblacionAct&lt;br&gt;AreaMillasCuadradas&lt;br&gt;Densidad&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+                    <mxGeometry height="132" width="220" y="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="e0" edge="1" parent="1" source="hof" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERmany;startFill=0;endArrow=ERmandOne;endFill=0;exitX=0;exitY=0.15;entryX=0.5;entryY=1;" target="plan" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e1" edge="1" parent="1" source="hof" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERmany;startFill=0;endArrow=ERmandOne;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="tben" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e2" edge="1" parent="1" source="hof" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERmany;startFill=0;endArrow=ERmandOne;endFill=0;exitX=1;exitY=0.1;entryX=0.3;entryY=1;" target="cond" value="copago">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e3" edge="1" parent="1" source="hof" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERmany;startFill=0;endArrow=ERmandOne;endFill=0;exitX=1;exitY=0.2;entryX=0.7;entryY=1;" target="cond" value="coseguro">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e4" edge="1" parent="1" source="hof" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERmany;startFill=0;endArrow=ERmandOne;endFill=0;exitX=0;exitY=0.5;entryX=1;entryY=0.5;" target="fecha" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e5" edge="1" parent="1" source="hof" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERmany;startFill=0;endArrow=ERmandOne;endFill=0;exitX=1;exitY=0.55;entryX=0;entryY=0.5;" target="prov" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e6" edge="1" parent="1" source="hof" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERmany;startFill=0;endArrow=ERmandOne;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="area" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="p1" edge="1" parent="1" source="pte" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERmany;startFill=0;endArrow=ERmandOne;endFill=0;exitX=0;exitY=0.5;entryX=1;entryY=0.5;strokeColor=light-dark(#000000,#FFFFFF);" target="area" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="p2" edge="1" parent="1" source="pte" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;startArrow=ERmany;startFill=0;endArrow=ERmandOne;endFill=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;strokeColor=light-dark(#000000,#FFFFFF);" target="geo" value="">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
